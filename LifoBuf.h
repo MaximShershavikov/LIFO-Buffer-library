@@ -26,44 +26,64 @@
 
 #pragma once
 
-#include <Windows.h>
+#define LINT       LifoBuf_int
+#define LUINT      LifoBuf_unsigned_int
+#define LCHAR      LifoBuf_char
+#define LUCHAR     LifoBuf_unsigned_char
+#define LSHORT     LifoBuf_short	
+#define LUSHORT    LifoBuf_unsigned_short
+#define LLONG      LifoBuf_long
+#define LULONG     LifoBuf_unsigned_long
+#define LLONGLONG  LifoBuf_long_long
+#define LULONGLONG LifoBuf_unsigned_long_long
+#define LDOUBLE    LifoBuf_double
 
-template <class T> class LifoBuf
-{
-private:
+typedef int                _int;
+typedef unsigned int       _unsigned_int;
+typedef char               _char;
+typedef unsigned char      _unsigned_char;
+typedef short              _short;
+typedef unsigned short     _unsigned_short;
+typedef long               _long;
+typedef unsigned long      _unsigned_long;
+typedef long long          _long_long;
+typedef unsigned long long _unsigned_long_long;
+typedef double             _double;
 
-	unsigned char* Buffer;
-	const unsigned int BuffSize;
-	MEMORYSTATUSEX* Memory;
-	unsigned int count;
-	bool err;
+#define DEF_CLASS_BUF_LIFO(type)											\
+{																			\
+private:																	\
+	void* pointer;															\
+public:																		\
+	LifoBuf##type(const unsigned int byte);									\
+	LifoBuf##type(const unsigned int byte, const unsigned int mem);			\
+	~LifoBuf##type();														\
+																			\
+	void push(type* value);													\
+	void push(type value);													\
+	void push(type* value, unsigned int size);								\
+	void pop(type& value);													\
+	void pop(type*& value);													\
+																			\
+	unsigned int QuantityBlockData();										\
+	unsigned int MaxSizeData();												\
+	char* AddrOfBlockData(unsigned int value);								\
+	char* ErrorText();														\
+																			\
+	void operator > (type* value);											\
+	void operator > (type value);											\
+	void operator < (type& value);											\
+	void operator < (type*& value);											\
+}																			\
 
-	struct Steck
-	{
-		unsigned int size;
-		unsigned int sizedata = NULL;
-		unsigned char* ptrlifo = nullptr;
-		struct Steck* next = nullptr;
-		struct Steck* prev = nullptr;
-	} *SteckAll, * SteckBlock, * ptr;
-
-	void __push();
-
-public:
-
-	LifoBuf(const unsigned int byte);
-	LifoBuf(const unsigned int byte, const unsigned int mem);
-	~LifoBuf();
-
-	void push(T* value);
-	void push(T value);
-	void push(T* value, unsigned int size);
-	void pop(T& value);
-	void pop(T*& value);
-
-	void operator > (T* value);
-	void operator > (T value);
-	void operator < (T& value);
-	void operator < (T*& value);
-};
-
+class LifoBuf_int				 DEF_CLASS_BUF_LIFO(_int);
+class LifoBuf_unsigned_int		 DEF_CLASS_BUF_LIFO(_unsigned_int);
+class LifoBuf_char				 DEF_CLASS_BUF_LIFO(_char);
+class LifoBuf_unsigned_char		 DEF_CLASS_BUF_LIFO(_unsigned_char);
+class LifoBuf_short				 DEF_CLASS_BUF_LIFO(_short);
+class LifoBuf_unsigned_short	 DEF_CLASS_BUF_LIFO(_unsigned_short);
+class LifoBuf_long				 DEF_CLASS_BUF_LIFO(_long);
+class LifoBuf_unsigned_long		 DEF_CLASS_BUF_LIFO(_unsigned_long);
+class LifoBuf_long_long			 DEF_CLASS_BUF_LIFO(_long_long);
+class LifoBuf_unsigned_long_long DEF_CLASS_BUF_LIFO(_unsigned_long_long);
+class LifoBuf_double			 DEF_CLASS_BUF_LIFO(_double);

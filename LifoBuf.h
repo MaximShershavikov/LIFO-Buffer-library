@@ -59,21 +59,22 @@ public:                                                             \
     LifoBuf##type(const unsigned int byte, const unsigned int mem); \
     ~LifoBuf##type();                                               \
                                                                     \
-    void push(type* value);                                         \
-    void push(type value);                                          \
-    void push(type* value, unsigned int size);                      \
-    void pop(type& value);                                          \
-    void pop(type*& value);                                         \
+    char *push(type* value);                                        \
+    char *push(type value);                                         \
+    char *push(type* value, unsigned int size);                     \
+    char *pop(type& value);                                         \
+    char *pop(type*& value);                                        \
                                                                     \
     unsigned int QuantityBlockData();                               \
     unsigned int MaxSizeData();                                     \
-    char* AddrOfBlockData(unsigned int value);                      \
-    char* ErrorText();                                              \
+    char *AddrOfBlockData(unsigned int value);                      \
+    char *AddrAndNumOfBlockData(unsigned int value);                \
+    char *ErrorText();                                              \
                                                                     \
-    void operator > (type* value);                                  \
-    void operator > (type value);                                   \
-    void operator < (type& value);                                  \
-    void operator < (type*& value);                                 \
+    char *operator > (type* value);                                 \
+    char *operator > (type value);                                  \
+    char *operator < (type& value);                                 \
+    char *operator < (type*& value);                                \
 }                                                                   \
 
 class LifoBuf_int                DEF_CLASS_BUF_LIFO(_int);

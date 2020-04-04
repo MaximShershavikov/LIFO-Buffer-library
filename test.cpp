@@ -26,61 +26,39 @@
 
 #include <iostream>
 #include <conio.h>
+#include <vector>
 #include "LiFoBuf.h"
 
 void main()
 {
-    unsigned int data_1[5] = { 0xffaaffaa, 0xdfaafdaa, 0x11001100, 0x88af88af, 0xccddccdd };
-    unsigned int data_2[3] = { 0xffaaffaa, 0xdfaafdaa, 0x11001100 };
-    unsigned int data_3[7] = { 0xffaaffaa, 0xdfaafdaa, 0x11001100, 0x88af88af, 0xccddccdd, 0x88af88af, 0xffaaffaa };
-    unsigned int data_4[2] = { 0xffaaffaa, 0xdfaafdaa };
-    unsigned int data_5[10] = { 0xffaaffaa, 0xdfaafdaa, 0x11001100, 0x88af88af, 0xccddccdd, 0x25612255, 0xf2ca7623, 0x01010101, 0xa1a2a3a4, 0x99435521 };
-
     unsigned int data_int[5][10] = { 0 };
     char data_char[10][10] = { 0 };
+
+    std::vector < std::vector<unsigned int> > data(5);
+    data[0] = { 0xffaaffaa, 0xdfaafdaa, 0x11001100, 0x88af88af, 0xccddccdd };
+    data[1] = { 0xffaaffaa, 0xdfaafdaa, 0x11001100 };
+    data[2] = { 0xffaaffaa, 0xdfaafdaa, 0x11001100, 0x88af88af, 0xccddccdd, 0x88af88af, 0xffaaffaa };
+    data[3] = { 0xffaaffaa, 0xdfaafdaa };
+    data[4] = { 0xffaaffaa, 0xdfaafdaa, 0x11001100, 0x88af88af, 0xccddccdd, 0x25612255, 0xf2ca7623, 0x01010101, 0xa1a2a3a4, 0x99435521 };
+
+    std::vector <char*> text = { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten" };
 
     LUINT LIFO_1(300);
     LCHAR LIFO_2(300);
 
-    LIFO_1.push(data_1, sizeof(data_1));
-    std::cout << LIFO_1.AddrOfBlockData(1) << std::endl;
+    for (int i = 0; i < 5; i++)
+    {
+        std::cout << LIFO_1.push(data[i].data(), (data[i].size() * 4)) << " ";
+        std::cout << LIFO_1.AddrAndNumOfBlockData(i + 1) << std::endl;
+    }
+    for (int i = 0; i < 5; i++) std::cout << LIFO_1.pop(*data_int[i]) << std::endl;
 
-    LIFO_1.push(data_2, sizeof(data_2));
-    std::cout << LIFO_1.AddrOfBlockData(2) << std::endl;
-
-    LIFO_1.push(data_3, sizeof(data_3));
-    std::cout << LIFO_1.AddrOfBlockData(3) << std::endl;
-
-    LIFO_1.push(data_4, sizeof(data_4));
-    std::cout << LIFO_1.AddrOfBlockData(4) << std::endl;
-
-    LIFO_1.push(data_5, sizeof(data_5));
-    std::cout << LIFO_1.AddrOfBlockData(5) << std::endl << std::endl;
-
-    for (int i = 0; i < 5; i++) LIFO_1.pop(*data_int[i]);
-
-    LIFO_2 > "one";
-    std::cout << LIFO_2.AddrOfBlockData(1) << std::endl;
-    LIFO_2 > "two";
-    std::cout << LIFO_2.AddrOfBlockData(2) << std::endl;
-    LIFO_2 > "three";
-    std::cout << LIFO_2.AddrOfBlockData(3) << std::endl;
-    LIFO_2 > "four";
-    std::cout << LIFO_2.AddrOfBlockData(4) << std::endl;
-    LIFO_2 > "five";
-    std::cout << LIFO_2.AddrOfBlockData(5) << std::endl;
-    LIFO_2 > "six";
-    std::cout << LIFO_2.AddrOfBlockData(6) << std::endl;
-    LIFO_2 > "seven";
-    std::cout << LIFO_2.AddrOfBlockData(7) << std::endl;
-    LIFO_2 > "eight";
-    std::cout << LIFO_2.AddrOfBlockData(8) << std::endl;
-    LIFO_2 > "nine";
-    std::cout << LIFO_2.AddrOfBlockData(9) << std::endl;
-    LIFO_2 > "ten";
-    std::cout << LIFO_2.AddrOfBlockData(10) << std::endl;
-
-    for (int i = 0; i < 10; i++) LIFO_2 < *data_char[i];
+    for (int i = 0; i < 10; i++)
+    {
+        LIFO_2 > text[i];
+        std::cout << LIFO_2.AddrAndNumOfBlockData(i + 1) << std::endl;
+    }
+    for (int i = 0; i < 10; i++) std::cout << (LIFO_2 < *data_char[i]) << std::endl;
 
     LIFO_1.~LifoBuf_unsigned_int();
     LIFO_2.~LifoBuf_char();

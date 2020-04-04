@@ -35,7 +35,7 @@ private:
 
     const unsigned int BuffSize;
     unsigned int       count;
-    char               Text[50];
+    char               Text[100];
     MEMORYSTATUSEX     *Memory;
     unsigned char      *Buffer;
 
@@ -57,21 +57,22 @@ public:
     LifoBuf(const unsigned int byte, const unsigned int mem);
     ~LifoBuf();
 
-    void push(T *value);
-    void push(T value);
-    void push(T *value, unsigned int size);
-    void pop(T &value);
-    void pop(T *&value);
+    char *push(T *value);
+    char *push(T value);
+    char *push(T *value, unsigned int size);
+    char *pop(T &value);
+    char *pop(T *&value);
 
     unsigned int QuantityBlockData();
     unsigned int MaxSizeData();
     char *AddrOfBlockData(unsigned int value);
+	char *AddrAndNumOfBlockData(unsigned int value);
     char *ErrorText();
 
-    void operator > (T *value);
-    void operator > (T value);
-    void operator < (T &value);
-    void operator < (T *&value);
+    char *operator > (T *value);
+    char *operator > (T value);
+    char *operator < (T &value);
+    char *operator < (T *&value);
 };
 
 template <class T> LifoBuf<T>::LifoBuf(const unsigned int byte) : BuffSize(byte), count(NULL), Text{ NULL }, Memory(new MEMORYSTATUSEX)
@@ -80,7 +81,7 @@ template <class T> LifoBuf<T>::LifoBuf(const unsigned int byte) : BuffSize(byte)
     GlobalMemoryStatusEx(Memory);
     if ((Memory->ullAvailPhys / 3) < byte)
     {
-        strcpy_s(Text, "Error - Maximum memory size reached");
+        strcpy_s(Text, "Error - Maximum memory size reached.");
         return;
     }
     Buffer = new unsigned char[byte];
@@ -98,7 +99,7 @@ template <class T> LifoBuf<T>::LifoBuf(const unsigned int byte, const unsigned i
     GlobalMemoryStatusEx(Memory);
     if ((Memory->ullAvailPhys / mem) < byte)
     {
-        strcpy_s(Text, "Error - Maximum memory size reached");
+        strcpy_s(Text, "Error - Maximum memory size reached.");
         return;
     }
     Buffer = new unsigned char[byte];
@@ -157,114 +158,143 @@ template <class T> void LifoBuf<T>::__pop()
     count--;
 }
 
-template <class T> void LifoBuf<T>::push(T *value)
+template <class T> char *LifoBuf<T>::push(T *value)
 {
     SteckBlock->size = strlen(reinterpret_cast<const char*>(value)) + 1;
     SteckBlock->sizedata += SteckBlock->size;
     SteckBlock->ptrlifo[SteckBlock->size - 1] = NULL;
-    memset(Text, NULL, sizeof(Text));
     if (SteckBlock->sizedata >= BuffSize)
     {
         if (SteckBlock->prev != nullptr)
-                SteckBlock->sizedata = SteckBlock->prev->sizedata;
-        strcpy_s(Text, "Error - Maximum buffer size reached");
-        return;
+            SteckBlock->sizedata = SteckBlock->prev->sizedata;
+        strcpy_s(Text, "Error - Maximum buffer size reached.");
+        return Text;
     }
     memcpy(SteckBlock->ptrlifo, value, SteckBlock->size);
 
     __push();
+    strcpy_s(Text, "Push successful.");
+    return Text;
 }
 
-template <class T> void LifoBuf<T>::push(T value)
+template <class T> char *LifoBuf<T>::push(T value)
 {
     SteckBlock->size = sizeof(&value);
     SteckBlock->sizedata += SteckBlock->size;
-    memset(Text, NULL, sizeof(Text));
     if (SteckBlock->sizedata >= BuffSize)
     {
         if (SteckBlock->prev != nullptr)
-                SteckBlock->sizedata = SteckBlock->prev->sizedata;
-        strcpy_s(Text, "Error - Maximum buffer size reached");
-        return;
+            SteckBlock->sizedata = SteckBlock->prev->sizedata;
+        strcpy_s(Text, "Error - Maximum buffer size reached.");
+        return Text;
     }
     memcpy(SteckBlock->ptrlifo, &value, SteckBlock->size);
 
     __push();
+    strcpy_s(Text, "Push successful.");
+    return Text;
 }
 
-template <class T> void LifoBuf<T>::push(T *value, unsigned int size)
+template <class T> char *LifoBuf<T>::push(T *value, unsigned int size)
 {
     SteckBlock->size = size;
     SteckBlock->sizedata += SteckBlock->size;
-    memset(Text, NULL, sizeof(Text));
     if (SteckBlock->sizedata >= BuffSize)
     {
         if (SteckBlock->prev != nullptr)
-                SteckBlock->sizedata = SteckBlock->prev->sizedata;
-        strcpy_s(Text, "Error - Maximum buffer size reached");
-        return;
+            SteckBlock->sizedata = SteckBlock->prev->sizedata;
+        strcpy_s(Text, "Error - Maximum buffer size reached.");
+        return Text;
     }
     memcpy(SteckBlock->ptrlifo, value, SteckBlock->size);
 
     __push();
+    strcpy_s(Text, "Push successful.");
+    return Text;
 }
 
-template <class T> void LifoBuf<T>::pop(T &value)
+template <class T> char *LifoBuf<T>::pop(T &value)
 {
-    memset(Text, NULL, sizeof(Text));
     if (SteckBlock->prev == nullptr)
     {
-        strcpy_s(Text, "Error - There no data in buffer");
+        strcpy_s(Text, "Error - There no data in buffer.");
         value = NULL;
-        return;
+        return Text;
     }
     memcpy(&value, &*SteckBlock->prev->ptrlifo, SteckBlock->prev->size);
     memset(SteckBlock->prev->ptrlifo, NULL, SteckBlock->prev->size);
 
     __pop();
+    strcpy_s(Text, "Pop successful.");
+    return Text;
 }
 
-template <class T> void LifoBuf<T>::pop(T *&value)
+template <class T> char *LifoBuf<T>::pop(T *&value)
 {
-    memset(Text, NULL, sizeof(Text));
     if (SteckBlock->prev == nullptr)
     {
-        strcpy_s(Text, "Error - There no data in buffer");
+        strcpy_s(Text, "Error - There no data in buffer.");
         value = NULL;
-        return;
+        return Text;
     }
     value = new T[SteckBlock->prev->size / sizeof(T)];
     memcpy(value, &*SteckBlock->prev->ptrlifo, SteckBlock->prev->size);
     memset(SteckBlock->prev->ptrlifo, NULL, SteckBlock->prev->size);
 
     __pop();
+    strcpy_s(Text, "Pop successful.");
+    return Text;
 }
 
 template <class T> char *LifoBuf<T>::AddrOfBlockData(unsigned int value)
 {
-    int num = 9;
-
     ptr = SteckAll;
-    memset(Text, NULL, sizeof(Text));
     if (value > count || value < 1)
     {
-        strcpy_s(Text, "Error - There no block of data");
+        strcpy_s(Text, "Error - There no block of data.");
         return Text;
     }
     if (SteckAll->next == nullptr)
     {
-        strcpy_s(Text, "Error - There no data in buffer");
+        strcpy_s(Text, "Error - There no data in buffer.");
         return Text;
     }
     for (unsigned int i = 1; i <= value; i++) ptr = ptr->next;
-    sprintf_s(Text, "%X", reinterpret_cast<unsigned int>(ptr->prev->ptrlifo));
-    for (int i = 10; i >= 0; i--)
-    {
-        if (Text[10] == '\0') { Text[num] = Text[i]; num--; }
-        if (Text[i] == '\0') Text[10] = Text[i];
-        Text[i] = '0';
-    }
+    sprintf_s(Text, "%p", reinterpret_cast<unsigned int>(ptr->prev->ptrlifo));
+    for (int i = 7; i >= 0; i--) Text[i + 2] = Text[i];
     Text[0] = '0'; Text[1] = 'x';
+    Text[10] = '\0';
+
+    return Text;
+}
+
+template <class T> char *LifoBuf<T>::AddrAndNumOfBlockData(unsigned int value)
+{
+    AddrOfBlockData(value);
+    if (Text[0] == 'E') return Text;
+    for (int i = 0; i <= strlen(Text); i++)
+    {
+        Text[29 + i] = Text[i];
+    }
+    memcpy(Text, "Address of Block ", 17);
+    for (int i = 26; i > 16; i--)
+    {
+        Text[i] = (value % 10) + 48;
+        value = value / 10;
+    }
+    value = NULL;
+    for (int i = 17; i < 27; i++)
+    {
+        if (value != NULL)
+        {
+            Text[i - value] = Text[i];
+            continue;
+        }
+        if (Text[i] != '0') { value = i - 17; i--; }
+    }
+    Text[27 - value] = ':';
+    Text[27 - (value - 1)] = ' ';
+    for (int i = 29; i < 49 ; i++) Text[i - value] = Text[i];
 
     return Text;
 }
@@ -273,8 +303,7 @@ template <class T> char* LifoBuf<T>::ErrorText()
 {
     if (Text[0] == 'E') return Text;
     else {
-        memset(Text, NULL, sizeof(Text));
-        strcpy_s(Text, "There no text of error in ErrorText()");
+        strcpy_s(Text, "There no text of error in ErrorText().");
         return Text;
     }
 }
@@ -289,7 +318,7 @@ template <class T> unsigned int LifoBuf<T>::MaxSizeData()
     return SteckBlock->prev->sizedata;
 }
 
-template <class T> void LifoBuf<T>::operator > (T *value) { push(value); }
-template <class T> void LifoBuf<T>::operator > (T value) { push(value); }
-template <class T> void LifoBuf<T>::operator < (T &value) { pop(value); }
-template <class T> void LifoBuf<T>::operator < (T *&value) { pop(value); }
+template <class T> char *LifoBuf<T>::operator > (T *value) { return push(value); }
+template <class T> char *LifoBuf<T>::operator > (T value) { return push(value); }
+template <class T> char *LifoBuf<T>::operator < (T &value) { return pop(value); }
+template <class T> char *LifoBuf<T>::operator < (T *&value) { return pop(value); }

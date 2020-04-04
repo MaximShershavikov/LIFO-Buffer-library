@@ -40,29 +40,29 @@ LifoBuf##type::LifoBuf##type(const unsigned int byte, const unsigned int mem) \
     pointer = Lifo;                                                           \
 }                                                                             \
                                                                               \
-void LifoBuf##type::push(type *value)                                         \
+char *LifoBuf##type::push(type *value)                                        \
 {                                                                             \
-    static_cast<LifoBuf<type>*>(pointer)->push(value);                        \
+    return static_cast<LifoBuf<type>*>(pointer)->push(value);                 \
 }                                                                             \
                                                                               \
-void LifoBuf##type::push(type value)                                          \
+char *LifoBuf##type::push(type value)                                         \
 {                                                                             \
-    static_cast<LifoBuf<type>*>(pointer)->push(value);                        \
+    return static_cast<LifoBuf<type>*>(pointer)->push(value);                 \
 }                                                                             \
                                                                               \
-void LifoBuf##type::push(type *value, unsigned int size)                      \
+char *LifoBuf##type::push(type *value, unsigned int size)                     \
 {                                                                             \
-    static_cast<LifoBuf<type>*>(pointer)->push(value, size);                  \
+    return static_cast<LifoBuf<type>*>(pointer)->push(value, size);           \
 }                                                                             \
                                                                               \
-void LifoBuf##type::pop(type &value)                                          \
+char *LifoBuf##type::pop(type &value)                                         \
 {                                                                             \
-    static_cast<LifoBuf<type>*>(pointer)->pop(value);                         \
+    return static_cast<LifoBuf<type>*>(pointer)->pop(value);                  \
 }                                                                             \
                                                                               \
-void LifoBuf##type::pop(type *&value)                                         \
+char *LifoBuf##type::pop(type *&value)                                        \
 {                                                                             \
-    static_cast<LifoBuf<type>*>(pointer)->pop(value);                         \
+    return static_cast<LifoBuf<type>*>(pointer)->pop(value);                  \
 }                                                                             \
                                                                               \
 unsigned int LifoBuf##type::QuantityBlockData()                               \
@@ -80,15 +80,20 @@ char *LifoBuf##type::AddrOfBlockData(unsigned int value)                      \
     return static_cast<LifoBuf<type>*>(pointer)->AddrOfBlockData(value);      \
 }                                                                             \
                                                                               \
+char *LifoBuf##type::AddrAndNumOfBlockData(unsigned int value)                \
+{                                                                             \
+    return static_cast<LifoBuf<type>*>(pointer)->AddrAndNumOfBlockData(value);\
+}                                                                             \
+                                                                              \
 char *LifoBuf##type::ErrorText()                                              \
 {                                                                             \
     return static_cast<LifoBuf<type>*>(pointer)->ErrorText();                 \
 }                                                                             \
                                                                               \
-void LifoBuf##type::operator > (type *value) { push(value); }                 \
-void LifoBuf##type::operator > (type value) { push(value); }                  \
-void LifoBuf##type::operator < (type &value) { pop(value); }                  \
-void LifoBuf##type::operator < (type *&value) { pop(value); }                 \
+char *LifoBuf##type::operator > (type *value) { return push(value); }         \
+char *LifoBuf##type::operator > (type value) { return push(value); }          \
+char *LifoBuf##type::operator < (type &value) { return pop(value); }          \
+char *LifoBuf##type::operator < (type *&value) { return pop(value); }         \
                                                                               \
 LifoBuf##type::~LifoBuf##type()                                               \
 {                                                                             \
